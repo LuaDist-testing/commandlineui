@@ -7,14 +7,29 @@
 --------------------------------------------------------------------------
 
 local M       = {} -- public interface
-M.Version     = '1.73'  -- insure against nil in line 387
-M.VersionDate = '18jul2014'
+M.Version     = '1.74'  -- works with lua 5.3
+M.VersionDate = '17apr2015'
 
 local P = require 'posix'    -- http://luaposix.github.io/luaposix/docs/
 local T = require 'terminfo' -- http://pjb.com.au/comp/lua/terminfo.html
 local K = require 'readkey'  -- http://pjb.com.au/comp/lua/readkey.html
 local L = require 'readline' -- http://pjb.com.au/comp/lua/readline.html
-local B = require 'bit'      -- LuaBitOp http://bitop.luajit.org/api.html
+_G.BITOPS = {}  -- global because load executes in the calling context
+local B = {}
+
+local version = string.gsub(_VERSION, "^%D+", "")
+if tonumber(version) < 5.3 then  -- 1.4
+    B = require 'bit'  -- LuaBitOp http://bitop.luajit.org/api.html
+else
+	local f = load([[
+    _G.BITOPS.bor    = function (a,b) return a|b  end
+    _G.BITOPS.band   = function (a,b) return a&b  end
+    _G.BITOPS.rshift = function (a,n) return a>>n end
+	]])
+	f()
+	B = _G.BITOPS
+end
+
 local G = require 'gdbm'     -- http://pjb.com.au/comp/lua/lgdbm.html
 -- require 'DataDumper'
 
@@ -1616,12 +1631,12 @@ I<HOME>, I<EDITOR> and I<PAGER>, if they are set.
 =head1 DOWNLOAD
 
 This module is available as a LuaRock in
-http://rocks.moonscript.org/modules/peterbillam
+http://luarocks.org/modules/peterbillam
 so you should be able to install it with the command:
 
  $ su
  Password:
- # luarocks install --server=http://rocks.moonscript.org commandlineui
+ # luarocks install commandlineui
 
 or:
 
@@ -1653,19 +1668,19 @@ Peter J Billam www.pjb.com.au/comp/contact.html
  http://www.pjb.com.au/comp/index.html#lua
  http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
  http://search.cpan.org/~pjb
- http://rocks.moonscript.org/modules/gvvaughan/luaposix
+ http://luarocks.org/modules/gvvaughan/luaposix
  http://luaposix.github.io/luaposix/docs/
- http://rocks.moonscript.org/modules/peterbillam/terminfo
+ http://luarocks.org/modules/peterbillam/terminfo
  http://pjb.com.au/comp/lua/terminfo.html
- http://rocks.moonscript.org/modules/peterbillam/readkey
+ http://luarocks.org/modules/peterbillam/readkey
  http://pjb.com.au/comp/lua/readkey.html
- http://rocks.moonscript.org/modules/peterbillam/readline
+ http://luarocks.org/modules/peterbillam/readline
  http://pjb.com.au/comp/lua/readline.html
- http://rocks.moonscript.org/modules/luarocks/lgdbm
+ http://luarocks.org/modules/luarocks/lgdbm
  http://pjb.com.au/comp/lua/lgdbm.html
- http://rocks.moonscript.org/modules/luarocks/luabitop
+ http://luarocks.org/modules/luarocks/luabitop
  http://bitop.luajit.org/api.html
- http://rocks.moonscript.org/modules/peterbillam/commandlineui
+ http://luarocks.org/modules/peterbillam/commandlineui
 
 =cut
 
