@@ -7,8 +7,8 @@
 --------------------------------------------------------------------------
 
 local M       = {} -- public interface
-M.Version     = '1.72'  -- 
-M.VersionDate = '07jun2014'
+M.Version     = '1.73'  -- insure against nil in line 387
+M.VersionDate = '18jul2014'
 
 local P = require 'posix'    -- http://luaposix.github.io/luaposix/docs/
 local T = require 'terminfo' -- http://pjb.com.au/comp/lua/terminfo.html
@@ -383,7 +383,7 @@ local function getch()  -- return multiple bytes if utf8
 					AbsCursX = 0;
 					while true do
 						c1 = TTY:read(1)
-						if c1 == 'R' then break end
+						if c1 == 'R' or not c1 then break end -- 1.73
 						AbsCursX = 10*AbsCursX + tonumber(c1)
 					end
 					return getch()
@@ -1632,6 +1632,7 @@ http://search.cpan.org/perldoc?Term::Clui
 
 =head1 CHANGES
 
+ 20140718 1.73 insure against nil in line 387
  20140607 1.72 switch pod and doc over to using moonrocks
  20131101 1.71 various undeclared global variables declared as local
  20131031      multichoice choose() consistently returns {} if cancelled
