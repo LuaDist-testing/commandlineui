@@ -121,7 +121,7 @@ which were in turn based on some even older curses-based programs in
 </p><p>
 It is intended to keep the Perl, Python and Lua version-numbers
 approximately synchronised.
-This is <I>CommandLineUI</I> version 1.70</p>
+This is <I>CommandLineUI</I> version 1.71</p>
 <p>
 </p>
 <hr />
@@ -417,7 +417,7 @@ so you should be able to install it with the command:</p>
  # luarocks install commandlineui</pre>
 <p>or:</p>
 <pre>
- # luarocks install http://www.pjb.com.au/comp/lua/commandlineui-1.70-0.rockspec</pre>
+ # luarocks install http://www.pjb.com.au/comp/lua/commandlineui-1.71-0.rockspec</pre>
 <p>The Perl module is available from CPAN at
 <a href="http://search.cpan.org/perldoc?Term::Clui">search.cpan.org/perldoc?Term::Clui</a></p>
 <p>
@@ -425,6 +425,8 @@ so you should be able to install it with the command:</p>
 <hr />
 <h2><a name="changes">CHANGES</a></h2>
 <pre>
+ 20131101 1.71 various undeclared global variables declared as local
+ 20131031      multichoice choose() consistently returns {} if cancelled
  20131019 1.70 check_size() repositioned after fmt(); new_mid_col defined=0
  20131010      calls to absent warn() eliminated; is_executable() redundant
  20131004 1.69 first working version in Lua</pre>

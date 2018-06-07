@@ -7,8 +7,8 @@
 --------------------------------------------------------------------------
 
 local M       = {} -- public interface
-M.Version     = '1.70'
-M.VersionDate = '10oct2013'
+M.Version     = '1.71'  -- multichoice choose() returns {} if cancelled
+M.VersionDate = '31oct2013'
 
 local P = require 'posix'    -- http://luaposix.github.io/luaposix/docs/
 local T = require 'terminfo' -- http://pjb.com.au/comp/lua/terminfo.html
@@ -36,6 +36,7 @@ local MaxRows      = 24
 local SizeChanged  = true
 local OtherLines   = {}  -- set by choose; only wr_screen uses this
 local IsUtf8       = false
+local wantarray    = false
 math.randomseed(os.time())
 local Pager = os.getenv('PAGER')
 if not Pager then
@@ -798,7 +799,7 @@ local function narrow_the_search (biglist)
 			erase_lines(1); endwin()
 			io.stderr:write("^C\r\n")
 			P.kill(P.getpid('pid'), P.SIGINT)
-			enter_mouse_mode(); return nil
+			enter_mouse_mode(); return {}  -- 1.71
 		elseif (c == "\24" or c == "\4") then  -- ^X, ^D, clear ...
 			if not s or #s < 1 then   -- 20070305 ?
 				ClueHasBeenGiven = false; erase_lines(1)
@@ -838,10 +839,10 @@ local function narrow_the_search (biglist)
 end
 
 function M.choose (question, a_list, options)
-	if not a_list or #a_list == 0 then return end
+	if not a_list or #a_list == 0 then return nil end
 	if not options then options = {} end
 	check_size()
-	local wantarray = false
+	wantarray = false
 	if options['multichoice'] then wantarray = true end
 	-- local list = {}
 	-- grep (($_ =~ s/[\r\n]+$//) and 0, @list);	-- chop final newlines
@@ -891,7 +892,7 @@ function M.choose (question, a_list, options)
 	CursorRow = Irow_a[ThisCell]  -- global, needed by handle_mouse
 
 	while true do
-		c = getch();
+		local c = getch();
 		local next_please = false
 		if SizeChanged then
 			-- _debug('choose: SizeChanged was true')
@@ -939,9 +940,9 @@ function M.choose (question, a_list, options)
 			ThisCell = ThisCell-1
 			wr_cell(ThisCell+1); wr_cell(ThisCell); 
 		elseif (((c == "j") or (c == KEY_DOWN)) and (Irow < Nrows)) then
-			mid_col = Icol_a[ThisCell] + 0.5*len(List[ThisCell])
-			left_of_target = 1000;
-			inew = ThisCell + 1
+			local mid_col = Icol_a[ThisCell] + 0.5*len(List[ThisCell]) -- 1.71
+			local left_of_target = 1000 -- 1.71
+			local inew = ThisCell + 1   -- 1.71
 			while inew < #List do  -- <=?
 				if Icol_a[inew] < mid_col then break end	-- skip rest of row
 				inew = inew + 1
@@ -955,12 +956,12 @@ function M.choose (question, a_list, options)
 				inew = inew + 1
 			end
 			if (new_mid_col-mid_col) > left_of_target then inew = inew-1 end
-			iold = ThisCell; ThisCell = inew
+			local iold = ThisCell; ThisCell = inew  -- 1.71
 			wr_cell(iold); wr_cell(ThisCell)
 		elseif (((c == "k") or (c == KEY_UP)) and (Irow > 1)) then
-			mid_col = Icol_a[ThisCell] + 0.5*len(List[ThisCell])
-			right_of_target = 1000;
-			inew = ThisCell - 1
+			local mid_col = Icol_a[ThisCell] + 0.5*len(List[ThisCell])  -- 1.71
+			local right_of_target = 1000   -- 1.71
+			local inew = ThisCell - 1      -- 1.71
 			while inew > 1 do  -- 1 ?  yes 1.70
 				if Irow_a[inew] < Irow_a[ThisCell] then break end
 				inew = inew - 1
@@ -976,7 +977,7 @@ function M.choose (question, a_list, options)
 			if (mid_col - new_mid_col) > right_of_target then
 				inew = inew + 1
 			end
-			iold = ThisCell; ThisCell = inew
+			local iold = ThisCell; ThisCell = inew  -- 1.71
 			wr_cell(iold); wr_cell(ThisCell)
 		elseif c == "\f" then
 			if SizeChanged then
@@ -999,7 +1000,7 @@ function M.choose (question, a_list, options)
 		elseif (c == "\r") then
 			erase_lines(1); go_to(firstlinelength+1, 0);
 			local chosen = {}
-			if (wantarray) then
+			if wantarray then
 				for i,v in ipairs(List) do
 					if Marked[i] or i==ThisCell then
 						chosen[#chosen+1] = List[i]
@@ -1384,7 +1385,7 @@ which were in turn based on some even older curses-based programs in I<C>.
 
 It is intended to keep the Perl, Python and Lua version-numbers
 approximately synchronised.
-This is I<CommandLineUI> version 1.70
+This is I<CommandLineUI> version 1.71
 
 =head1 WINDOW-SIZE
 
@@ -1485,7 +1486,7 @@ If the items won't fit on the screen, the user is asked to enter
 a substring as a clue. As soon as the matching items will fit,
 they are displayed to be chosen as normal. If the user pressed B<q>
 at this choice, they are asked if they wish to change their substring
-clue; if they reply "n" to this, choose quits and returns I<undefined>.
+clue; if they reply "n" to this, choose quits and returns I<nil>.
 
 If the I<question> is multi-line,
 the first line is put at the top as usual with the choices
@@ -1631,6 +1632,8 @@ http://search.cpan.org/perldoc?Term::Clui
 
 =head1 CHANGES
 
+ 20131101 1.71 various undeclared global variables declared as local
+ 20131031      multichoice choose() consistently returns {} if cancelled
  20131019 1.70 check_size() repositioned after fmt(); new_mid_col defined=0
  20131010      calls to absent warn() eliminated; is_executable() redundant
  20131004 1.69 first working version in Lua
