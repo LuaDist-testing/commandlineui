@@ -7,8 +7,8 @@
 --------------------------------------------------------------------------
 
 local M       = {} -- public interface
-M.Version     = '1.75'  -- 
-M.VersionDate = '25apr2015'
+M.Version     = '1.76'  -- 
+M.VersionDate = '08oct2017'
 
 local P = require 'posix'    -- http://luaposix.github.io/luaposix/docs/
 local T = require 'terminfo' -- http://pjb.com.au/comp/lua/terminfo.html
@@ -393,14 +393,14 @@ local function getch()  -- return multiple bytes if utf8
 					AbsCursY = tonumber(c)
 					while true do
 						if c1 == ';' then break end
-						AbsCursY = 10*AbsCursY + tonumber(c1)
+						AbsCursY = 10*AbsCursY + (tonumber(c1) or 0) -- 1.76
 						c1 = TTY:read(1)
 					end
-					AbsCursX = 0;
+					AbsCursX = 0
 					while true do
 						c1 = TTY:read(1)
 						if c1 == 'R' or not c1 then break end -- 1.73
-						AbsCursX = 10*AbsCursX + tonumber(c1)
+						AbsCursX = 10*AbsCursX + (tonumber(c1) or 0) -- 1.76
 					end
 					return getch()
 				end
@@ -1648,6 +1648,7 @@ http://search.cpan.org/perldoc?Term::Clui
 
 =head1 CHANGES
 
+ 20171008 1.76 defend against a race condition in line 403
  20170525 1.75 fix bug with nil str in line 222
  20150422 1.74 works with lua 5.3
  20140718 1.73 insure against nil in line 387
