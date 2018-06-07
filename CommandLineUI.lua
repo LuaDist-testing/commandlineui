@@ -7,8 +7,8 @@
 --------------------------------------------------------------------------
 
 local M       = {} -- public interface
-M.Version     = '1.74'  -- works with lua 5.3
-M.VersionDate = '17apr2015'
+M.Version     = '1.75'  -- 
+M.VersionDate = '25apr2015'
 
 local P = require 'posix'    -- http://luaposix.github.io/luaposix/docs/
 local T = require 'terminfo' -- http://pjb.com.au/comp/lua/terminfo.html
@@ -18,7 +18,7 @@ _G.BITOPS = {}  -- global because load executes in the calling context
 local B = {}
 
 local version = string.gsub(_VERSION, "^%D+", "")
-if tonumber(version) < 5.3 then  -- 1.4
+if tonumber(version) < 5.3 then  -- 1.74
     B = require 'bit'  -- LuaBitOp http://bitop.luajit.org/api.html
 else
 	local f = load([[
@@ -209,6 +209,7 @@ TI['cursor_right'] = T.get('cursor_right') or "\027[C"
 TI['clear_screen'] = T.get('clear_screen') or "\027[H\027[J"
 
 local function utf8len(str)
+	if not str then return 0 end   -- 1.75  20170525
 --[[	  UCS code      :       Bytes    (see man 7 utf8)
 	x00000000-0x0000007F 0xxxxxxx
 	x00000080-0x000007FF 110xxxxx 10xxxxxx
@@ -1640,13 +1641,15 @@ so you should be able to install it with the command:
 
 or:
 
- # luarocks install http://www.pjb.com.au/comp/lua/commandlineui-1.72-0.rockspec
+ # luarocks install http://www.pjb.com.au/comp/lua/commandlineui-1.75-0.rockspec
 
 The Perl module is available from CPAN at
 http://search.cpan.org/perldoc?Term::Clui
 
 =head1 CHANGES
 
+ 20170525 1.75 fix bug with nil str in line 222
+ 20150422 1.74 works with lua 5.3
  20140718 1.73 insure against nil in line 387
  20140607 1.72 switch pod and doc over to using moonrocks
  20131101 1.71 various undeclared global variables declared as local
