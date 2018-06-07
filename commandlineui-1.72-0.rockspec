@@ -1,16 +1,16 @@
 -- This file was automatically generated for the LuaDist project.
 
 package = "commandlineui"
-version = "1.71-1"
+version = "1.72-0"
 -- LuaDist source
 source = {
-  tag = "1.71-1",
+  tag = "1.72-0",
   url = "git://github.com/LuaDist-testing/commandlineui.git"
 }
 -- Original source
 -- source = {
---    url = "http://www.pjb.com.au/comp/lua/CommandLineUI-1.71.tar.gz",
---    md5 = "225f9cf675620d0de1a03fa7b217de74"
+--    url = "http://www.pjb.com.au/comp/lua/CommandLineUI-1.72.tar.gz",
+--    md5 = "1ed2ff8c5cdadf92b4edfcf22d4b8eb9"
 -- }
 description = {
    summary = "Command-Line User Interface, like CPAN's Term::Clui",
@@ -25,14 +25,30 @@ description = {
    license = "MIT/X11"
 }
 dependencies = {
-   "lua >=5.1, <5.3", "luaposix >= 31", "readline >= 1.3", "readkey  >= 1.2", "terminfo >= 1.1", "luabitop", "lgdbm >= 20130702"
+   "lua >=5.1, <5.3",
+   "luaposix >= 31",
+   "readline >= 1.3",
+   "readkey  >= 1.2",
+   "terminfo >= 1.1",
+   "luabitop",
+   "lgdbm >= 20130702",
 }
+-- external_dependencies = {
+--   ALSA = {
+--      header  = "alsa/asoundlib.h",
+--      library = "asound",
+--   }
+-- }
 build = {
    type = "builtin",
    modules = {
-      CommandLineUI = "CommandLineUI.lua"
+      ["CommandLineUI"] = "CommandLineUI.lua",
+--    ["C-readkey"] = {
+--       sources   = { "C-readkey.c" },
+--         incdirs   = { "$(ALSA_INCDIR)" },
+--         libdirs   = { "$(ALSA_LIBDIR)" },
+--         libraries = { "asound" },
+--    }
    },
-   copy_directories = {
-      "doc", "test"
-   }
+   copy_directories = { "doc", "test" }
 }

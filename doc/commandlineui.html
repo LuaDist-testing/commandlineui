@@ -121,7 +121,7 @@ which were in turn based on some even older curses-based programs in
 </p><p>
 It is intended to keep the Perl, Python and Lua version-numbers
 approximately synchronised.
-This is <I>CommandLineUI</I> version 1.71</p>
+This is <I>CommandLineUI</I> version 1.72</p>
 <p>
 </p>
 <hr />
@@ -408,23 +408,33 @@ rip AudioCD-&gt;WAV      rip MP3CD-&gt;MP3        run alsamixer
 <hr />
 <h2><a name="download">DOWNLOAD</a></h2>
 <p>This module is available as a LuaRock in
-<a href="http://luarocks.org/repositories/rocks/index.html#commandlineui">
-luarocks.org/repositories/rocks/index.html#commandlineui</a>
+<A HREF="http://rocks.moonscript.org/modules/peterbillam">
+rocks.moonscript.org/modules/peterbillam</A>
 so you should be able to install it with the command:</p>
 <pre>
  $ su
  Password:
- # luarocks install commandlineui</pre>
+ # luarocks install --server=http://rocks.moonscript.org commandlineui</pre>
 <p>or:</p>
 <pre>
- # luarocks install http://www.pjb.com.au/comp/lua/commandlineui-1.71-0.rockspec</pre>
-<p>The Perl module is available from CPAN at
+ # luarocks install http://www.pjb.com.au/comp/lua/commandlineui-1.72-0.rockspec</pre><p>
+This module requires the
+ <A HREF="http://rocks.moonscript.org/modules/luarocks/lgdbm">lgdbm</A>
+module, so if the install fails with some message beginning with<BR><CODE>
+&nbsp; Error: Could not find expected file libgdbm.a, or libgdbm.so,<BR></CODE>
+then consult
+<B><A HREF="lgdbm.html#download">lgdbm.html</A></B>
+for details of how to get round it;
+after which you should be able to install <I>commandlineui</I> with no problem.
+
+</p><p>The Perl module is available from CPAN at
 <a href="http://search.cpan.org/perldoc?Term::Clui">search.cpan.org/perldoc?Term::Clui</a></p>
 <p>
 </p>
 <hr />
 <h2><a name="changes">CHANGES</a></h2>
 <pre>
+ 20140607 1.72 switch pod and doc over to using moonrocks
  20131101 1.71 various undeclared global variables declared as local
  20131031      multichoice choose() consistently returns {} if cancelled
  20131019 1.70 check_size() repositioned after fmt(); new_mid_col defined=0
@@ -450,19 +460,27 @@ www.pjb.com.au/comp/contact.html</A>
  <a href="http://www.pjb.com.au/comp/index.html#lua">http://www.pjb.com.au/comp/index.html#lua</a>
  <a href="http://invisible-island.net/xterm/ctlseqs/ctlseqs.html">http://invisible-island.net/xterm/ctlseqs/ctlseqs.html</a>
  <a href="http://search.cpan.org/~pjb">http://search.cpan.org/~pjb</a>
- <a href="http://luarocks.org/repositories/rocks/index.html#luaposix">http://luarocks.org/repositories/rocks/index.html#luaposix</a>
+ <A HREF="http://rocks.moonscript.org/modules/gvvaughan/luaposix">http://rocks.moonscript.org/modules/gvvaughan/luaposix</A>
  <a href="http://luaposix.github.io/luaposix/docs/">http://luaposix.github.io/luaposix/docs/</a>
- <a href="http://luarocks.org/repositories/rocks/index.html#terminfo">http://luarocks.org/repositories/rocks/index.html#terminfo</a>
+ <A HREF="http://rocks.moonscript.org/modules/peterbillam/terminfo">http://rocks.moonscript.org/modules/peterbillam/terminfo</A>
  <a href="http://pjb.com.au/comp/lua/terminfo.html">http://pjb.com.au/comp/lua/terminfo.html</a>
- <a href="http://luarocks.org/repositories/rocks/index.html#readkey">http://luarocks.org/repositories/rocks/index.html#readkey</a>
+ <A HREF="http://rocks.moonscript.org/modules/peterbillam/readkey">http://rocks.moonscript.org/modules/peterbillam/readkey</A>
  <a href="http://pjb.com.au/comp/lua/readkey.html">http://pjb.com.au/comp/lua/readkey.html</a>
- <a href="http://luarocks.org/repositories/rocks/index.html#readline">http://luarocks.org/repositories/rocks/index.html#readline</a>
+ <A HREF="http://rocks.moonscript.org/modules/peterbillam/readline">http://rocks.moonscript.org/modules/peterbillam/readline</A>
  <a href="http://pjb.com.au/comp/lua/readline.html">http://pjb.com.au/comp/lua/readline.html</a>
- <a href="http://luarocks.org/repositories/rocks/index.html#luabitop">http://luarocks.org/repositories/rocks/index.html#luabitop</a>
- <a href="http://bitop.luajit.org/api.html">http://bitop.luajit.org/api.html</a>
- <a href="http://luarocks.org/repositories/rocks/index.html#lgdbm">http://luarocks.org/repositories/rocks/index.html#lgdbm</a>
+ <A HREF="http://rocks.moonscript.org/modules/luarocks/lgdbm">http://rocks.moonscript.org/modules/luarocks/lgdbm</A>
  <a href="http://pjb.com.au/comp/lua/lgdbm.html">http://pjb.com.au/comp/lua/lgdbm.html</a>
- <a href="http://luarocks.org/repositories/rocks/index.html#commandlineui">http://luarocks.org/repositories/rocks/index.html#commandlineui</a></pre>
+ <A HREF="http://rocks.moonscript.org/modules/luarocks/luabitop">http://rocks.moonscript.org/modules/luarocks/luabitop</A>
+ <a href="http://bitop.luajit.org/api.html">http://bitop.luajit.org/api.html</a>
+ <A HREF="http://rocks.moonscript.org/modules/peterbillam/commandlineui">http://rocks.moonscript.org/modules/peterbillam/commandlineui</A></pre>
+<!-- <a href="http://luarocks.org/repositories/rocks/index.html#luaposix">http://luarocks.org/repositories/rocks/index.html#luaposix</a>
+<a href="http://luarocks.org/repositories/rocks/index.html#terminfo">http://luarocks.org/repositories/rocks/index.html#terminfo</a>
+<a href="http://luarocks.org/repositories/rocks/index.html#readkey">http://luarocks.org/repositories/rocks/index.html#readkey</a>
+<a href="http://luarocks.org/repositories/rocks/index.html#readline">http://luarocks.org/repositories/rocks/index.html#readline</a>
+<a href="http://luarocks.org/repositories/rocks/index.html#commandlineui">http://luarocks.org/repositories/rocks/index.html#commandlineui</a>
+ <a href="http://luarocks.org/repositories/rocks/index.html#lgdbm">http://luarocks.org/repositories/rocks/index.html#lgdbm</a>
+ <a href="http://luarocks.org/repositories/rocks/index.html#luabitop">http://luarocks.org/repositories/rocks/index.html#luabitop</a>
+-->
 
 </DIV>
 </body>

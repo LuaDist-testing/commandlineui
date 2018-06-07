@@ -7,8 +7,8 @@
 --------------------------------------------------------------------------
 
 local M       = {} -- public interface
-M.Version     = '1.71'  -- multichoice choose() returns {} if cancelled
-M.VersionDate = '31oct2013'
+M.Version     = '1.72'  -- 
+M.VersionDate = '07jun2014'
 
 local P = require 'posix'    -- http://luaposix.github.io/luaposix/docs/
 local T = require 'terminfo' -- http://pjb.com.au/comp/lua/terminfo.html
@@ -1385,7 +1385,7 @@ which were in turn based on some even older curses-based programs in I<C>.
 
 It is intended to keep the Perl, Python and Lua version-numbers
 approximately synchronised.
-This is I<CommandLineUI> version 1.71
+This is I<CommandLineUI> version 1.72
 
 =head1 WINDOW-SIZE
 
@@ -1616,22 +1616,23 @@ I<HOME>, I<EDITOR> and I<PAGER>, if they are set.
 =head1 DOWNLOAD
 
 This module is available as a LuaRock in
-http://luarocks.org/repositories/rocks/index.html#commandlineui
+http://rocks.moonscript.org/modules/peterbillam
 so you should be able to install it with the command:
 
  $ su
  Password:
- # luarocks install commandlineui
+ # luarocks install --server=http://rocks.moonscript.org commandlineui
 
 or:
 
- # luarocks install http://www.pjb.com.au/comp/lua/commandlineui-1.70-0.rockspec
+ # luarocks install http://www.pjb.com.au/comp/lua/commandlineui-1.72-0.rockspec
 
 The Perl module is available from CPAN at
 http://search.cpan.org/perldoc?Term::Clui
 
 =head1 CHANGES
 
+ 20140607 1.72 switch pod and doc over to using moonrocks
  20131101 1.71 various undeclared global variables declared as local
  20131031      multichoice choose() consistently returns {} if cancelled
  20131019 1.70 check_size() repositioned after fmt(); new_mid_col defined=0
@@ -1651,19 +1652,19 @@ Peter J Billam www.pjb.com.au/comp/contact.html
  http://www.pjb.com.au/comp/index.html#lua
  http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
  http://search.cpan.org/~pjb
- http://luarocks.org/repositories/rocks/index.html#luaposix
+ http://rocks.moonscript.org/modules/gvvaughan/luaposix
  http://luaposix.github.io/luaposix/docs/
- http://luarocks.org/repositories/rocks/index.html#terminfo
+ http://rocks.moonscript.org/modules/peterbillam/terminfo
  http://pjb.com.au/comp/lua/terminfo.html
- http://luarocks.org/repositories/rocks/index.html#readkey
+ http://rocks.moonscript.org/modules/peterbillam/readkey
  http://pjb.com.au/comp/lua/readkey.html
- http://luarocks.org/repositories/rocks/index.html#readline
+ http://rocks.moonscript.org/modules/peterbillam/readline
  http://pjb.com.au/comp/lua/readline.html
- http://luarocks.org/repositories/rocks/index.html#luabitop
- http://bitop.luajit.org/api.html
- http://luarocks.org/repositories/rocks/index.html#lgdbm
+ http://rocks.moonscript.org/modules/luarocks/lgdbm
  http://pjb.com.au/comp/lua/lgdbm.html
- http://luarocks.org/repositories/rocks/index.html#commandlineui
+ http://rocks.moonscript.org/modules/luarocks/luabitop
+ http://bitop.luajit.org/api.html
+ http://rocks.moonscript.org/modules/peterbillam/commandlineui
 
 =cut
 
