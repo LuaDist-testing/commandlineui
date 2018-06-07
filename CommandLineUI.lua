@@ -7,8 +7,8 @@
 --------------------------------------------------------------------------
 
 local M       = {} -- public interface
-M.Version     = '1.69'
-M.VersionDate = '04oct2013'
+M.Version     = '1.70'
+M.VersionDate = '10oct2013'
 
 local P = require 'posix'    -- http://luaposix.github.io/luaposix/docs/
 local T = require 'terminfo' -- http://pjb.com.au/comp/lua/terminfo.html
@@ -67,6 +67,7 @@ end
 
 local HistFile = '~/.clui_dir/'..string.sub(
   string.gsub(arg[0], '^.*/', ''), 1, 8)..'_history'
+L.set_options{histfile=HistFile}  -- 1.70
 
 local function homedir(user)
 	if not user and os.getenv('HOME') then return os.getenv('HOME') end
@@ -109,8 +110,8 @@ local function sleep(t)
 	P.nanosleep(sec,ns)
 end
 
-local function debug(s)
-	local DEBUG = io.open('/tmp/clui.log', 'a')
+local function _debug(s)
+	local DEBUG = io.open('/tmp/debug', 'a')
 	DEBUG:write(s.."\n")
 	DEBUG:close()
 end
@@ -135,31 +136,6 @@ local function splice(array, offset, length, list)
 	return result
 end
 
-local function is_executable (fn)
-	local mode,uid,gid,typ = P.stat(fn,'mode','uid','gid','type')
-	--  mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime, type
-	if not mode then return nil end
-	if string.sub(mode,3,3) == 'x' then return true end -- world-executable
-	local euid,egid = P.getpid('euid','egid')
-	if string.sub(mode,9,9)=='x' and euid==uid then -- owner-executable
-		return true
-	end
-	if string.sub(mode,6,6) == 'x' then -- group-executable
-		if egid == gid then return true end
-		local groups = P.getgroups()
-		for k,v in ipairs(groups) do
-			if gid == v then return true end
-		end
-	end
-	return false
-end
-
-local function is_readable (fn)
-	-- for exists, check if P.stat(fn) returns non-nil
-	local f=io.open(fn,'r')
-	if f then f:close(); return true else return false end
-end
-
 local function is_textfile (fn)
 	local f=io.open(fn,'r')
 	if not f then return false end
@@ -174,7 +150,7 @@ end
 local function which(s)
 	local f
 	for i,d in ipairs(split(os.getenv('PATH'), ':')) do
-		f=d..'/'..s; if is_executable(f) then return f end
+		f=d..'/'..s; if P.access(f, 'x') then return f end
 	end
 end
 
@@ -290,12 +266,16 @@ local function violet   ()  TTY:write("\027[35m") TTY:flush() end
 
 local function getc_wrapper (timeout)
 	local c = K.ReadKey(timeout, TTY)
+--debug('timeout='..tostring(timeout)..' TTY='..tostring(TTY)..' c='..tostring(c))
+	-- if c is nil and SizeChanged, then we should check_size and try again
+	-- can check_size be called whenever this getc_wrapper has been called?
 	return c
 end
 
 local function wr_cell(t) end
 
 local function handle_mouse (x, y, button_pressed, button_drag) -- 1.50 
+--debug('x='..tostring(x)..' y='..tostring(y)..' button_pressed='..tostring(button_pressed))
 	TopRow = AbsCursY - CursorRow;
 	if LastEventWasPress then LastEventWasPress = false; return false end
 	if y < TopRow then return false end
@@ -467,7 +447,7 @@ local WasMouseMode      = false;
 local function enter_mouse_mode()   -- 1.50
 	if os.getenv('CLUI_MOUSE') == 'OFF' then return false end   -- 1.62
 	if IsMouseMode then
-		warn("enter_mouse_mode but already IsMouseMode\r\n")
+		io.stderr:write("enter_mouse_mode but already IsMouseMode\r\n")
 		return false
 	end
 	TTY:write("\027[?1003h"); TTY:flush()  -- sets SET_ANY_EVENT_MOUSE mode
@@ -477,7 +457,8 @@ end
 local function leave_mouse_mode()   -- 1.50
 	if os.getenv('CLUI_MOUSE') == 'OFF' then return false end   -- 1.62
 	if not IsMouseMode then
-		warn("leave_mouse_mode but not IsMouseMode\r\n"); return false
+		io.stderr:write("leave_mouse_mode but not IsMouseMode\r\n")
+		return false
 	end
 	TTY:write("\027[?1003l"); TTY:flush() -- cancels SET_ANY_EVENT_MOUSE mode
 	IsMouseMode = false
@@ -524,33 +505,12 @@ function endwin()
 	InitscrAlreadyRun = 0
 end
 
------------------------ size handling ----------------------
-
-local function check_size()
-	if not SizeChanged then return end
-	MaxCols, MaxRows = K.GetTerminalSize(TTY)
-	MaxCols = tonumber(MaxCols) - 1
-	MaxRows = tonumber(MaxRows)
-	if OtherLines and #OtherLines > 0 then
-		OtherLines = fmt(table.concat(OtherLines, "\n"))
-	end
-	SizeChanged = false
-end
-check_size()
-
--- $SIG{'WINCH'} = sub { $SizeChanged = 1; };
--- http://luaposix.github.io/luaposix/docs/index.html
--- P.signal (signum, handler, flags)
--- SIGWINCH is not part of POSIX 9945-1-1996; is it POSIX-1003 ?
-P.signal (28, function() SizeChanged=true end, 0)
 
 -------------------------- infrastructure -------------------------
 
 local function erase_lines(n)  -- leaves cursor at beginning of line n
 	go_to(0, n); TTY:write(TI['clr_eos']); TTY:flush()
 end
-
-
 
 local function fmt (text, options)
 	-- Used by ask ,choose, confirm and tiview; formats text within MaxCols
@@ -617,6 +577,32 @@ local function fmt (text, options)
 		return o_lines
 	end
 end
+
+
+local function check_size() -- size handling
+	-- debug('check_size: SizeChanged='..tostring(SizeChanged))
+	if not SizeChanged then return end
+	MaxCols, MaxRows = K.GetTerminalSize(TTY)
+	MaxCols = tonumber(MaxCols) - 1
+	MaxRows = tonumber(MaxRows)
+	-- _debug('MaxCols='..tostring(MaxCols)..' MaxRows='..tostring(MaxRows))
+	if OtherLines and #OtherLines > 0 then
+		OtherLines = fmt(table.concat(OtherLines, "\n"))
+	end
+	SizeChanged = false
+end
+check_size()
+
+-- $SIG{'WINCH'} = sub { $SizeChanged = 1; };
+-- http://luaposix.github.io/luaposix/docs/index.html
+-- P.signal (signum, handler, flags)
+-- SIGWINCH is not part of POSIX; asm-generic/signal.h says it's 28
+P.signal (28, function()
+	SizeChanged=true
+	-- _debug('detected SIGWINCH')
+end, 0)  -- 1.70
+-- luaposix only has SA_RESETHAND SA_NOCLDSTOP SA_NODEFER SA_NOCLDWAIT
+-- asm-generic/signal.h says SA_RESTART is 0x10000000 which is 268435456
 
 local function display_otherlines(question)
 	local a = split(question, '\r?\n', 2)
@@ -810,7 +796,7 @@ local function narrow_the_search (biglist)
 			end
 		elseif (c == "\3") then  -- 1.56
 			erase_lines(1); endwin()
-			warn("^C\n")
+			io.stderr:write("^C\r\n")
 			P.kill(P.getpid('pid'), P.SIGINT)
 			enter_mouse_mode(); return nil
 		elseif (c == "\24" or c == "\4") then  -- ^X, ^D, clear ...
@@ -848,7 +834,7 @@ local function narrow_the_search (biglist)
 			ask_for_clue(nchoices, i, ss)
 		end
 	end
-	warn("narrow_the_search: shouldn't reach here ...\n")
+	io.stderr:write("narrow_the_search: shouldn't reach here ...\r\n")
 end
 
 function M.choose (question, a_list, options)
@@ -859,6 +845,7 @@ function M.choose (question, a_list, options)
 	if options['multichoice'] then wantarray = true end
 	-- local list = {}
 	-- grep (($_ =~ s/[\r\n]+$//) and 0, @list);	-- chop final newlines
+	List = {}  -- 1.70
 	for k,v in ipairs(a_list) do List[k] = string.gsub(v, '%s$', '') end
 	local biglist = deepcopy(List)
 	local icell
@@ -907,6 +894,7 @@ function M.choose (question, a_list, options)
 		c = getch();
 		local next_please = false
 		if SizeChanged then
+			-- _debug('choose: SizeChanged was true')
 			size_and_layout(List, Nrows)
 			if Nrows >= MaxRows then
 				List = narrow_the_search(List);
@@ -958,11 +946,12 @@ function M.choose (question, a_list, options)
 				if Icol_a[inew] < mid_col then break end	-- skip rest of row
 				inew = inew + 1
 			end
+			local new_mid_col = 0  -- 1.70
 			while inew < #List do  -- <=?
 				new_mid_col = Icol_a[inew] + 0.5*len(List[inew]);
 				if new_mid_col >= mid_col then break end  -- we've reached it
 				if Icol_a[inew+1] <= Icol_a[inew] then break end -- EOL
-				left_of_target = mid_col - new_mid_col;
+				left_of_target = mid_col - new_mid_col
 				inew = inew + 1
 			end
 			if (new_mid_col-mid_col) > left_of_target then inew = inew-1 end
@@ -972,11 +961,12 @@ function M.choose (question, a_list, options)
 			mid_col = Icol_a[ThisCell] + 0.5*len(List[ThisCell])
 			right_of_target = 1000;
 			inew = ThisCell - 1
-			while inew > 0 do  -- 1 ?
+			while inew > 1 do  -- 1 ?  yes 1.70
 				if Irow_a[inew] < Irow_a[ThisCell] then break end
 				inew = inew - 1
 			end
-			while inew > 0 do -- 1 ?
+			local new_mid_col = 0  -- 1.70
+			while inew > 1 do -- 1 ?  yes 1.70
 				if Icol_a[inew] < 1 then break end
 				new_mid_col = Icol_a[inew] + 0.5*len(List[inew])
 				if new_mid_col < mid_col then break end  -- we're past it
@@ -1003,7 +993,7 @@ function M.choose (question, a_list, options)
 			wr_screen()
 		elseif (c == "\3") then  -- 1.56
 			erase_lines(1); endwin()
-			warn "^C\n"
+			io.stderr:write("^C\r\n")
 			P.kill(P.getpid('pid'), P.SIGINT)
 			return nil
 		elseif (c == "\r") then
@@ -1048,11 +1038,12 @@ function M.choose (question, a_list, options)
 				wr_cell(ThisCell)
 			end
 		elseif c == "?" then
-			warn("help\r\n")
+			io.stderr:write("help\r\n")  -- BUG: extremely unhelpful :-(
+			-- should maybe set OtherLines to help_text('choose') and redraw
 		end
 	end
 	endwin()
-	warn("choose: shouldn't reach here ...\n")
+	io.stderr:write("choose: shouldn't reach here ...\r\n")
 end
 
 function M.help_text(mode) -- 1.54
@@ -1096,8 +1087,7 @@ function M.confirm (question)  -- asks user Yes|No, returns true|false
 	while true do
 		response = K.ReadKey(0, tty)
 		if response == "\3" then   -- ^C 1.56
-			-- erase_lines(1); endwin()
-			-- warn("^C\n")
+			-- erase_lines(1); endwin(); warn("^C\n")
 			K.ReadMode('restore', tty); tty:flush(); tty:close()
 			P.kill(P.getpid('pid'), P.SIGINT)
 			return nil
@@ -1139,10 +1129,10 @@ function M.edit (title, text)
 		local file = title
 		-- weed out no-go situations needs require 'lfs', lfs.attributes(file)
 		--if (-d $file) then
-		--	sorry("$file is already a directory\n"); return 0
+		--	M.sorry("$file is already a directory\n"); return 0
 		--end
 		--if (-B _ and -s _) then
-		--	sorry("$file is not a text file\n"); return 0
+		--	M.sorry("$file is not a text file\n"); return 0
 		--end
 		--if (-T _ and !-w _) then view($file); return 1; end
 		-- it's a writeable text file, so work out the locations
@@ -1197,7 +1187,7 @@ function M.edit (title, text)
 end
 local function logit (rcslog, file, msg)
 	local F = io.open(rcslog, 'a')
-	if not F then  sorry("can't open "..rcslog) return nil end
+	if not F then  M.sorry("can't open "..rcslog) return nil end
 	local pid = P.fork()  -- log in background for better response time
 		if not pid then  -- child
 			local user = P.getpid('euid')
@@ -1214,7 +1204,7 @@ end
 ----------------------- sorry stuff -------------------------
 
 function M.sorry(msg) -- warns user of an error condition
-	io.stderr:write("Sorry, "..msg.."\n")
+	io.stderr:write("Sorry, "..msg.."\r\n")
 end
 function M.inform (msg)
 	msg = string.gsub(msg, '\n*$', '\n')
@@ -1257,12 +1247,12 @@ local function tiview (title, text)
 			puts("\r"); endwin(); tiview(title,text); return true
 		end
 	end
-	warn("tiview: shouldn't reach here\n")
+	io.stderr:write("tiview: shouldn't reach here\r\n")
 end
 
 function M.view (title, text)  -- or (filename) =
 	if not text and string.find(string.lower(title),'%.doc$')
-	  and is_readable(title) then
+	  and P.access(title, 'r') then
 		local wvText = which('wvText')
 		if wvText then
 			local tmpf = "/tmp/wv"..P.getpid('pid')
@@ -1394,7 +1384,7 @@ which were in turn based on some even older curses-based programs in I<C>.
 
 It is intended to keep the Perl, Python and Lua version-numbers
 approximately synchronised.
-This is I<CommandLineUI> version 1.69
+This is I<CommandLineUI> version 1.70
 
 =head1 WINDOW-SIZE
 
@@ -1430,9 +1420,9 @@ should tell you if this number is correct on your system.
 Asks the user the I<question> and returns a string answer,
 with no newline character at the end.
 
-This function uses I<GDBM> to provide filename-completion with
-the I<Tab> key, and history with the Up and Down arrow keys just as in the
-I<bash> shell,
+This function uses I<Gnu Readline> to provide filename-completion with
+the I<Tab> key, and history with the Up and Down arrow keys,
+just like in the I<bash> shell.
 
 It also displays multi-line questions in the
 same way as I<confirm> and I<choose> do;
@@ -1461,17 +1451,18 @@ Displays the question, and formats the list items onto the lines beneath it.
 
 If the I<multichoice> option is not set,
 the user can choose an item using arrow keys (or hjkl) and Return,
+or with the mouse-left-click,
 or cancel the choice with a "q".
 I<choose> then returns the chosen string,
 or I<nil> if the choice was cancelled.
 
 If the I<multichoice> option is set,
-the user can also mark an item with the SpaceBar.
+the user can also mark an item with the SpaceBar, or the mouse-right-click.
 I<choose> then returns an array of the marked items,
 (including the item highlit when Return was pressed),
 or an empty array if the choice was cancelled.
 
-A GDBM database is maintained of the I<question> and its chosen response.
+A I<GDBM> database is maintained of the I<question> and its chosen response.
 The next time the user is offered a choice with the same question,
 if that response is still in the list it is highlighted
 as the default; otherwise the first item is highlighted.
@@ -1525,12 +1516,12 @@ Uses I<rcs> if the directory RCS/ exists
 
 =item I<sorry( message )>
 
-Similar to I<warn("Sorry, "..message)>
+Similar to I<io.stderr:write("Sorry, "..message.."\r\n")>
 
 =item I<inform( message )>
 
-Similar to I<io.stderr:write("message\n")> except that it doesn't add the
-newline at the end if there already is one,
+Similar to I<io.stderr:write(message.."\r\n")> except that it
+doesn't add the newline at the end if there already is one,
 and it uses I</dev/tty> rather than I<STDERR> if it can.
 
 =item I<view( title, text )>  OR  I<view( filename )>
@@ -1624,7 +1615,7 @@ I<HOME>, I<EDITOR> and I<PAGER>, if they are set.
 =head1 DOWNLOAD
 
 This module is available as a LuaRock in
-http://luarocks.org/repositories/rocks/index.html#CommandLineUI
+http://luarocks.org/repositories/rocks/index.html#commandlineui
 so you should be able to install it with the command:
 
  $ su
@@ -1633,13 +1624,15 @@ so you should be able to install it with the command:
 
 or:
 
- # luarocks install http://www.pjb.com.au/comp/lua/commandlineui-1.69-0.rockspec
+ # luarocks install http://www.pjb.com.au/comp/lua/commandlineui-1.70-0.rockspec
 
 The Perl module is available from CPAN at
 http://search.cpan.org/perldoc?Term::Clui
 
 =head1 CHANGES
 
+ 20131019 1.70 check_size() repositioned after fmt(); new_mid_col defined=0
+ 20131010      calls to absent warn() eliminated; is_executable() redundant
  20131004 1.69 first working version in Lua
 
 =head1 AUTHOR
@@ -1667,7 +1660,7 @@ Peter J Billam www.pjb.com.au/comp/contact.html
  http://bitop.luajit.org/api.html
  http://luarocks.org/repositories/rocks/index.html#lgdbm
  http://pjb.com.au/comp/lua/lgdbm.html
- http://luarocks.org/repositories/rocks/index.html#CommandLineUI
+ http://luarocks.org/repositories/rocks/index.html#commandlineui
 
 =cut
 

@@ -6,7 +6,7 @@ CONTENT="stty, raw, cooked, Lua, module, luarocks">
 </HEAD>
 <BODY LINK="#000066" VLINK="#000066" ALINK="#000066">
 <DIV>
-<H1><IMG SRC="../logo.gif" ALT=" " WIDTH=81 HEIGHT=32>
+<H1><IMG SRC="../logo.jpg" ALT=" " WIDTH=126 HEIGHT=52>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <FONT COLOR="#800000"><I>CommandLineUI.lua</I></FONT>
 </H1>
@@ -30,11 +30,12 @@ CONTENT="stty, raw, cooked, Lua, module, luarocks">
 </TD><TD ALIGN="left">
 <ul>
 	<li><a href="#environment">ENVIRONMENT</a></li>
+	<li><a href="#examples">EXAMPLES</a></li>
 	<li><a href="#download">DOWNLOAD</a></li>
-	<li><a href="#changes">CHANGES</a></li>
 </ul>
 </TD><TD ALIGN="left">
 <ul>
+	<li><a href="#changes">CHANGES</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 </ul>
@@ -120,7 +121,7 @@ which were in turn based on some even older curses-based programs in
 </p><p>
 It is intended to keep the Perl, Python and Lua version-numbers
 approximately synchronised.
-This is <I>CommandLineUI</I> version 1.69</p>
+This is <I>CommandLineUI</I> version 1.70</p>
 <p>
 </p>
 <hr />
@@ -159,9 +160,9 @@ should tell you if this number is correct on your system.
 <dd>
 <p>Asks the user the <I>question</I> and returns a string answer,
 with no newline character at the end.</p>
-<p>This function uses <I>GDBM</I> to provide filename-completion with
-the <I>Tab</I> key, and history with the Up and Down arrow keys just as in the
-<I>bash</I> shell,</p>
+<p>This function uses <I>Gnu Readline</I> to provide filename-completion with
+the <I>Tab</I> key, and history with the Up and Down arrow keys,
+just like in the <I>bash</I> shell.</p>
 <p>It also displays multi-line questions in the
 same way as <I>confirm</I> and <I>choose</I> do;
 if the <I>question</I> is multi-line,
@@ -176,13 +177,14 @@ and ctrl-D or ctrl-X clear the current string.</p>
 <dt><B><a name="ask_password" class="item"><I>ask_password( question )</I></a></B></dt>
 
 <dd>
-<p>Does the same as <I>ask</I>, but with no echo, as used for password entry.</p>
+<p>Does the same as <I><A HREF="#ask">ask</A></I>,
+but with no echo, as used for password entry.</p>
 </dd>
 <dt><B><a name="ask_filename" class="item"><I>ask_filename( question )</I></a></B></dt>
 
 <dd>
 <p>In this Lua module, Tab-filename-completion is enabled by default,
-and this function is just a synonym for <I>ask</I></p>
+and this function is just a synonym for <I><A HREF="#ask">ask</A></I></p>
 </dd>
 <dt><B><a name="choose" class="item"><I>choose( question, a_list [, {multichoice=true}] )</I></a></B></dt>
 
@@ -191,17 +193,18 @@ and this function is just a synonym for <I>ask</I></p>
 </p><p>
 If the <I>multichoice</I> option is not set,
 the user can choose an item using arrow keys (or hjkl) and Return,
+or with the mouse-left-click,
 or cancel the choice with a &quot;q&quot;.
 <I>choose</I> then returns the chosen string,
 or <I>nil</I> if the choice was cancelled.
 </p><p>
 If the <I>multichoice</I> option is set,
-the user can also mark an item with the SpaceBar.
+the user can also mark an item with the SpaceBar, or the mouse-right-click.
 <I>choose</I> then returns an array of the marked items,
 (including the item highlit when Return was pressed),
 or an empty array if the choice was cancelled.
 </p><p>
-A GDBM database is maintained of the <I>question</I> and its chosen
+A <I>GDBM</I> database is maintained of the <I>question</I> and its chosen
 response.  The next time the user is offered a choice with the same question,
 if that response is still in the list it is highlighted
 as the default; otherwise the first item is highlighted.
@@ -215,9 +218,9 @@ that the user might fail to notice some of the highlit items
 </p><p>
 The database <I>~/.clui_dir/choices.gdbm</I> or <I>$CLUI_DIR/choices.gdbm</I>
 is available to be read or written if lower-level manipulation is needed,
-and the functions <I>get_default</I>(question) and
-<I>set_default</I>(question, choice) should be used for this purpose,
-as they handle DBM's problem with concurrent accesses.
+and the functions <I><A HREF="#get_default">get_default</A></I>(question) and
+<I><A HREF="#set_default">set_default</A></I>(question, choice) should be
+used for this purpose, as they handle DBM's problem with concurrent accesses.
 The whole default database mechanism can be disabled by
 <I>CLUI_DIR=OFF</I> if you really want to :-(
 </p><p>
@@ -260,13 +263,13 @@ Uses <I>rcs</I> if the directory RCS/ exists</p>
 <dt><B><a name="sorry" class="item"><I>sorry( message )</I></a></B></dt>
 
 <dd>
-<p>Similar to <I>warn(&quot;Sorry, &quot;..message)</I></p>
+<p>Similar to <I>io.stderr:write(&quot;Sorry, &quot;..message.."\r\n")</I></p>
 </dd>
 <dt><B><a name="inform" class="item"><I>inform( message )</I></a></B></dt>
 
 <dd>
-<p>Similar to <I>io.stderr:write(&quot;message\n&quot;)</I> except that it doesn't add the
-newline at the end if there already is one,
+<p>Similar to <I>io.stderr:write(message.."\r\n")</I> except that
+it doesn't add the newline at the end if there already is one,
 and it uses <I>/dev/tty</I> rather than <I>STDERR</I> if it can.</p>
 </dd>
 <dt><B><a name="view" class="item"><I>view( title, text )</I>  OR  <I>view( filename )</I></a></B></dt>
@@ -368,9 +371,45 @@ then all strings will be displayed assuming they are <I>utf8</I> strings.
 <p>
 </p>
 <hr />
+<h2><a name="examples">EXAMPLES</a></h2>
+<dl>
+
+<dt><B><a name="example_confirm" class="item"><I>/usr/local/bin/confirm</I></a></B></dt>
+<dd>
+<PRE>
+#! /usr/bin/lua
+-- usage: confirm 'start X ?' &amp;&amp; startx
+--        confirm "OK to delete $file" &amp;&amp; rm $file
+local C = require 'CommandLineUI'
+if C.confirm(arg[1]) then os.exit(0) else os.exit(1) end
+</PRE>
+</dd>
+
+<dt><B><a name="example_audio_stuff" class="item"><I>
+<A HREF="audio_stuff.lua">/usr/local/bin/audio_stuff</A></I></a></B></dt>
+<dd>
+This script is a wrapper for
+<I>aplaymidi, cdda2wav, cdrecord, lame, timidity</I> etc.
+</P><P>
+Written as an example for the <I>CommandLineUI</I> module,
+it integrates various open-source programs for handling Midi, WAV, MP3,
+CDDA and DVD files into one ArrowKey-and-Return user-interface.
+</P><PRE>
+burn files-&gt;DataCD    burn WAV-&gt;AudioCD     change Directory
+connect MIDIports     consult Manual        convert MIDI-&gt;MP3
+convert MIDI-&gt;WAV     copy audio CD         copy video DVD
+decode MP3-&gt;WAV       encode WAV-&gt;MP2       encode WAV-&gt;MP3
+play MIDI,WAV,MP3     record AudioIn-&gt;WAV   record Keyboard-&gt;MIDI
+rip AudioCD-&gt;WAV      rip MP3CD-&gt;MP3        run alsamixer
+</PRE>
+</dd></dl>
+<p>
+</p>
+<hr />
 <h2><a name="download">DOWNLOAD</a></h2>
 <p>This module is available as a LuaRock in
-<a href="http://luarocks.org/repositories/rocks/index.html#CommandLineUI">http://luarocks.org/repositories/rocks/index.html#CommandLineUI</a>
+<a href="http://luarocks.org/repositories/rocks/index.html#commandlineui">
+luarocks.org/repositories/rocks/index.html#commandlineui</a>
 so you should be able to install it with the command:</p>
 <pre>
  $ su
@@ -378,7 +417,7 @@ so you should be able to install it with the command:</p>
  # luarocks install commandlineui</pre>
 <p>or:</p>
 <pre>
- # luarocks install http://www.pjb.com.au/comp/lua/commandlineui-1.69-0.rockspec</pre>
+ # luarocks install http://www.pjb.com.au/comp/lua/commandlineui-1.70-0.rockspec</pre>
 <p>The Perl module is available from CPAN at
 <a href="http://search.cpan.org/perldoc?Term::Clui">search.cpan.org/perldoc?Term::Clui</a></p>
 <p>
@@ -386,6 +425,8 @@ so you should be able to install it with the command:</p>
 <hr />
 <h2><a name="changes">CHANGES</a></h2>
 <pre>
+ 20131019 1.70 check_size() repositioned after fmt(); new_mid_col defined=0
+ 20131010      calls to absent warn() eliminated; is_executable() redundant
  20131004 1.69 first working version in Lua</pre>
 <p>
 </p>
@@ -419,7 +460,7 @@ www.pjb.com.au/comp/contact.html</A>
  <a href="http://bitop.luajit.org/api.html">http://bitop.luajit.org/api.html</a>
  <a href="http://luarocks.org/repositories/rocks/index.html#lgdbm">http://luarocks.org/repositories/rocks/index.html#lgdbm</a>
  <a href="http://pjb.com.au/comp/lua/lgdbm.html">http://pjb.com.au/comp/lua/lgdbm.html</a>
- <a href="http://luarocks.org/repositories/rocks/index.html#CommandLineUI">http://luarocks.org/repositories/rocks/index.html#CommandLineUI</a></pre>
+ <a href="http://luarocks.org/repositories/rocks/index.html#commandlineui">http://luarocks.org/repositories/rocks/index.html#commandlineui</a></pre>
 
 </DIV>
 </body>

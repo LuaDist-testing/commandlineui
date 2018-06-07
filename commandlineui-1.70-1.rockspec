@@ -1,16 +1,16 @@
 -- This file was automatically generated for the LuaDist project.
 
 package = "commandlineui"
-version = "1.69-1"
+version = "1.70-1"
 -- LuaDist source
 source = {
-  tag = "1.69-1",
+  tag = "1.70-1",
   url = "git://github.com/LuaDist-testing/commandlineui.git"
 }
 -- Original source
 -- source = {
---    url = "http://www.pjb.com.au/comp/lua/CommandLineUI-1.69.tar.gz",
---    md5 = "8373384106cd4044f62d09f6498b46ca"
+--    url = "http://www.pjb.com.au/comp/lua/CommandLineUI-1.70.tar.gz",
+--    md5 = "b914ff9d21839478ef2d7aa72644a5a5"
 -- }
 description = {
    summary = "Command-Line User Interface, like CPAN's Term::Clui",
@@ -25,7 +25,7 @@ description = {
    license = "MIT/X11"
 }
 dependencies = {
-   "lua >= 5.1", "luaposix >= 31", "readline >= 1.1", "readkey >= 1.1", "terminfo >= 1.1", "luabitop", "lgdbm >= 20130702.52"
+   "lua >= 5.1", "luaposix >= 31", "readline >= 1.1", "readkey >= 1.1", "terminfo >= 1.1", "luabitop", "lgdbm >= 20130702"
 }
 build = {
    type = "builtin",

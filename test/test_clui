@@ -1,0 +1,215 @@
+#! /usr/local/bin/lua
+local C = require 'CommandLineUI'
+require 'DataDumper'
+--[[
+local s = C.ask(
+	'What are your first words ?'..C.help_text('ask')
+)
+print('s='..tostring(s))
+
+local p = [=[How does this multiline work ?
+These subsequent lines are supposed to be displayed beneath the question.
+You could also check that Tab-completion works on filenames, and that
+the up-arrow works to get you the history file.
+]=]
+s = C.ask(p)
+print('s='..tostring(s))
+
+s = C.ask_password("Password ?\nDon't enter any real passwords here...")
+print('s='..s)
+
+s = C.confirm("OK to proceed ?\njust kidding...")
+print('s='..tostring(s))
+--]]
+local a = {'red', 'green', 'blue', 'black'}
+s = C.choose('Favourite colour ?'..C.help_text('choose'), a)
+print('s='..tostring(s))
+
+a = {'red', 'green', 'blue', 'black', 'pink', 'brown', 'orange',
+  'flourescent pink', 'grey', 'light grey', 'dark grey', 'ochre'}
+s = C.choose('Favourite colour ?', a)
+print('s='..tostring(s))
+
+s = C.choose('Favourite colours ?'..C.help_text('multi'), a, {multichoice=true})
+print('s='..DataDumper(s))
+
+os.exit()
+
+Brillouin = "Léon Brillouin";
+Delbrueck = "Max Delbrück";
+Descartes = "René Descartes";
+Goedel    = "Kurt Gödel";
+Levy      = "Paul Lévy";
+Poincare  = "Henri Poincaré";
+Schroedinger = "Erwin Schrödinger";
+Schroedinger2 = "Another Schrödinger";
+
+local scientists = {
+    'Luis Alvarez', 'Alain Aspect', 'Michael Barnsley', 'Johann Bernouilli',
+    'Nicolas Bernouilli', 'Friedrich Wilhelm Bessel', 'John Bell',
+    'Antoine Becquerel', 'Hans Bethe', 'David Bohm', 'Niels Bohr',
+    'Ludwig Boltzmann', 'Hermann Bondi', 'George Boole', 'Max Born',
+    'Satyendra Bose', 'Robert Boyle', Brillouin, 'Eugenio Calabi',
+    'Georg Cantor', 'James Chadwick', 'Gregory Chaitin',
+    'Subrahmanyan Chandrasekar', 'Geoffrey Chew', 'Alonzo Church',
+    'John Horton Conway', 'Francis Crick', 'Marie Curie', 'Charles Darwin',
+    'Humphrey Davy', 'Richard Dawkins', 'Louis de Broglie', Delbrueck,
+    Descartes, 'Willem de Sitter', 'Bruce DeWitt', 'Paul Dirac',
+    'Freeman Dyson', 'Arthur Stanley Eddington', 'Albert Einstein',
+    'Leonhard Euler', 'Hugh Everett', 'Michael Faraday', 'Pierre Fatou',
+    'Mitchell Feigenbaum', 'Pierre de Fermat', 'Enrico Fermi',
+    'Richard Feynman', 'Joseph Fraunhofer', 'Galileo Galilei',
+    'Evariste Galois', 'George Gamov', 'Carl Friedrich Gauss',
+    'Murray Gell-Mann', Goedel, 'Alan Guth', 'Stephen Hawking',
+    'Felix Hausdorff', 'Werner Heisenberg', 'Charles Hermite',
+    'Peter Higgs', 'David Hilbert', 'Fred Hoyle', 'Edwin Hubble',
+    'Christian Huygens', 'David Hilbert', 'Edwin Hubble', 'Pascual Jordan',
+    'Gaston Julia', 'Marc Kac', 'Theodor Kaluza', 'Stuart Kauffman',
+    'William Lord Kelvin', 'Gustav Robert Kirchhoff', 'Oskar Klein',
+    'Helge von Kock', 'Willis Lamb', 'Lev Davidovich Landau', 'Paul Langevin',
+    'Pierre Simon de Laplace', 'Gottfried Wilhelm Leibnitz', Levy,
+    'Hendrik Lorentz', 'James Clark Maxwell', 'Marston Morse',
+    'Benoit Mandelbrot', 'Gregor Mendel', 'Dmitri Mendeleev', 'Robert Millikan',
+    'Hermann Minkowski', 'John von Neumann', 'Isaac Newton', 'Emmy Noether',
+    'Hans Christian Oersted', 'Lars Onsager', 'Robert Oppenheimer',
+    'Abraham Pais', 'Heinz Pagels', 'Vilfredo Pareto', 'Louis Pasteur',
+    'Wolfgang Pauli', 'Linus Pauling', 'Guiseppe Peano', 'Rudolf Peierls',
+    'Roger Penrose', 'Arno Penzias', 'Jean Perrin', 'Max Planck',
+    'Boris Podolsky', Poincare, 'Isidor Rabi', 'Srinivasa Ramanujan',
+    'Lord Rayleigh', 'Lewis Fry Richardson', 'B. Riemann', 'Nathan Rosen',
+    'Ernest Rutherford', 'Abdus Salam', Schroedinger,
+    'Karl Schwarzschild', 'Julian Schwinger', 'Claude Shannon',
+    'Waclaw Sierpinski', 'Leo Szilard', 'Kip Thorne', 'Alan Turning',
+    'Sin-itro Tomonaga', 'Stanislaw Ulam', 'James Watson', 'Karl Weierstrauss',
+    'Hermann Weyl', 'Steven Weinberg', 'John Wheeler', 'Charles Weiner',
+    'Norbert Wiener', 'Eugene Wigner', 'Robert Wilson', 'Edward Witten',
+    'Shing-Tung Yau', 'Chen-Ning Yang', 'Hideki Yukawa', 'George Kingsley Zipf',
+}
+s = C.choose('Your favourite scientist ?', scientists)
+print('s='..tostring(s))
+
+local t1 = [[
+Physics beyond the Standard Model is needed to explain neutrino masses
+and mixing.
+]]
+local t2 = [[
+Edward Frenkel’s new book Love and Math is now out. ...
+The Langlands story is a complex one, but it starts with a very deep
+and beautiful idea that brings together different parts of mathematics:
+one way to think about number theory is to think of rational numbers
+as rational functions on a space, the space of primes. One then ends
+up seeing all sorts of parallels between the study of Riemann surfaces
+and number theory. Frenkel explains this in detail, including André
+Weil's description of a "Rosetta stone", a translation between aspects
+of number theory, aspects of Riemann surface theory, and yet a third
+intermediate parallel theory, that of algebraic curves over a finite field.
+
+In this precision era, sea level is no longer good enough;
+  it is affected by extraneous factors
+  such as winds, tides, currents, salinity and temperature.
+The equation for the earth's radius, where :
+  f = latitude
+  a = equatorial radius = 6,378,137      metres
+  b =   polar   radius  = 6,356,753.3142 metres
+is :
+R(f)^2 = (a^4*cos(f)^2 + b^4*sin(f)^2) / (a^2*cos(f)^2 + b^2*sin(f)^2)
+so there is 21384.6858 metres difference between equatorial and polar radii
+This ellipsoid is used by the GPS system,
+  and is known as World Geodetic System 84 (WGS 84)
+]]
+local t3 = [[
+http://www.bbc.co.uk/news/science-environment-23854904
+
+Scientists say the slow down in global warming since 1998 can be explained
+by a natural cooling in part of the Pacific ocean.  But temperatures will
+rise again when the Pacific swings back to a warmer state, they argue.
+The research is published in the journal Nature.
+
+Prof Shang-Ping Xie, Scripps Insitution, said there were two possible
+reasons why the continuing flow of CO2 has not driven the mercury higher.
+The first is that water vapour, soot and other aerosols in the atmosphere
+have reflected sunlight back into space and thereby had a cooling
+effect on the Earth.  The second is natural variability in the climate,
+especially the impact of cooling waters in the tropical Pacific ocean.
+
+Although it only covers 8.2% of the planet, the region is sometimes called
+the engine room of the world's climate system and atmospheric circulation.
+Researchers already know that a naturally occurring cycle in this area,
+called the El Nino-Southern Oscillation, has a major impact on global climate.
+But Prof Xie and colleagues were interested in a different cycle called the
+Pacific Decadal Oscillation that lasts for a much longer period of time.
+
+This model also explains some of the other contradictions seen since
+temperatures flat lined.  There have been major heat waves in Europe in
+2003, Russia in 2010 and in the US in 2012.  Arctic sea ice also dropped
+to its lowest recorded level in 2012. All these are indications that
+the climate is continuing to warm, but the global average temperature
+has remained below the figure for 1998.
+
+"The solution to this contradiction is that temperature has behaved
+differently between winter and summer seasons," said Prof Xie.  "The
+influence of the equatorial Pacific ocean is strongest in winter but
+weakest during the summer, so CO2 can keep working on the temperature
+and sea ice in the Arctic over the summer."  The new work supports the
+idea that the heat in the atmosphere has gone into the oceans.
+
+http://www.bbc.co.uk/news/uk-scotland-edinburgh-east-fife-23861397
+
+Uni of St Andrews scientists create 'fastest man-made spinning object'
+To do this they manufactured a microscopic sphere of calcium carbonate
+only four millionths of a metre in diameter.  The team then used the
+miniscule forces of laser light to hold the sphere with the radiation
+pressure of light - rather like levitating a beach ball with a jet
+of water.  They exploited the property of polarisation of the laser
+light that changed as the light passed through the levitating sphere,
+exerting a small twist or torque.  Placing the sphere in vacuum largely
+removed the drag due to any gas environment, allowing the team to achieve
+the very high rotation rates.
+
+In addition to the rotation, the team observed a "compression" of the
+excursions or "wobble" of the particle in all three dimensions, which
+can be understood as a "cooling" of the motion.
+
+Dr Yoshihiko Arita of the university's School of Physics and Astronomy
+said: "This is an exciting, thought-provoking experiment that pushes
+the boundary of our understanding of rotating bodies.  "I am intrigued
+with the prospect of extending this to multiple trapped particles and
+rotating systems.  "We may even be able to shed light on the area of
+quantum friction - that is does quantum mechanics put the brakes on the
+motion or spinning particle even though we are in a near perfect vacuum
+with no other apparent sources of friction?"
+
+Dr Michael Mazilu, a newly appointed lecturer in the school, added:
+"This system poses fascinating questions with regard to thermodynamics
+and is a challenging system to model theoretically.  "The rotation rate
+is so fast that the angular acceleration at the sphere surface is one
+billion times that of gravity on the Earth surface. It's amazing that
+the centrifugal forces do not cause the sphere to disintegrate."
+
+The third member of the team, Professor Kishan Dholakia, said he
+believed they had "performed a real breakthrough piece of work" that
+would resonate with the international community.  "In addition to the
+exciting fundamental physics aspects, this experiment will allow us to
+probe the nature of friction in very small systems, which has relevance
+to the next generation of microscopic devices. And it's always good to
+hold a 'world record' - even if for only a while," he added
+
+]]
+C.view('/etc/passwd')
+C.view('t1', t1)
+C.view('t2', t2)
+C.view('t3', t3)
+
+local t4 = C.edit('This is editing t3', t3)
+C.view('t3 is now:', t4)
+
+local t = assert(io.open('/tmp/test_clui','w'))
+t:write('Testing edit(filename)...\n\n')
+t:write(t2)
+t:close()
+C.edit('/tmp/test_clui')
+
+C.inform('These words come to you through inform() :-)')
+C.confirm('Are you ready to test back_up(2) ?')
+C.back_up(2)
+
